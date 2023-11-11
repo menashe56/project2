@@ -4,10 +4,10 @@
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "npm-run-all -p start-expo start-server",
-    "start-expo": "expo start", 
-    "start-server": "node server/server.js", 
-    "android": "expo start --android", 
-    "ios": "expo start --ios", 
+    "start-expo": "expo start",
+    "start-server": "node server/server.js",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
     "web": "expo start --web"
   },
   "dependencies": {
