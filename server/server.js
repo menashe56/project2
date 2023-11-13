@@ -5,11 +5,11 @@ const app = express();
 const port = 3000;
 
 const client = new Client({
-  host: "localhost",
-  user: "postgres",
-  port: 5432,
-  password: "123456",
-  database: "students"
+    host: "16.170.229.168",
+    user: "chatapp",
+    port: 5432,
+    password: "123456",
+    database: "students"
 });
 
 client.connect();
