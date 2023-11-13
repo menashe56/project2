@@ -1,101 +1,105 @@
 import { StatusBar } from 'expo-status-bar';
 import { Alert, Button, Modal, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
-import React, {useState} from 'react'
+import React, { useState, useEffect } from 'react'; // Import useEffect
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import axios from 'axios';
-
+import * as SQLite from 'expo-sqlite';
 
 export default function App() {
+  const db = SQLite.openDatabase('mydb.db');
+  
+  // State variable to store SQLite data
+  const [sqliteData, setSqliteData] = useState([]);
+
+  const handlePrintData2 = () => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        'CREATE TABLE IF NOT EXISTS mytable (id INTEGER PRIMARY KEY NOT NULL, name TEXT, age INTEGER);',
+        [],
+        () => console.log('Table created successfully'),
+        (error) => console.log('Error:', error)
+      );
+    });
+
+    db.transaction((tx) => {
+      tx.executeSql(
+        'INSERT INTO mytable (name, age) VALUES (?, ?)',
+        ['John', 30],
+        () => console.log('Data inserted successfully'),
+        (error) => console.log('Error:', error)
+      );
+    });
+
+    db.transaction((tx) => {
+      tx.executeSql(
+        'SELECT * FROM mytable',
+        [],
+        (_, { rows: { _array } }) => {
+          const data = _array;
+          console.log('SQLite Data:', data);
+          setSqliteData(data); // Update state with SQLite data
+        },
+        (error) => console.log('Error:', error)
+      );
+    });
+  };
+
+  // Add your handleInsertData function here (to insert data into SQLite)
 
   const [data, setData] = useState([]);
-  const [ModalOpen,setModalOpen] = useState(false);
-
+  const [ModalOpen, setModalOpen] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [age, setAge] = useState('');
   const [dob, setDob] = useState('');
 
-
-  const handlePrintData = () => {
-    // Fetch data from your server's API endpoint
-    fetch('http://10.0.0.14:3000/api/fetch')
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.length === 0) {
-          // Show an alert if no student is found
-          Alert.alert('There is no data.');
-        } else {
-          console.log('Data received:', data);
-          setData(data); // Store the fetched data in the component's state
-          setModalOpen(true)
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-      });
-  };
-
-  const AddStudent = () => {
-    const dataToInsert = { Roll, Name };
-  
-    Axios.post('http://10.0.0.14:3000/api/insert', { data: dataToInsert })
-      .then((response) => {
-        console.log('Server response status:', response.status);
-        return response.data;
-      })
-      .then((data) => {
-        console.log('Data inserted successfully:', data);
-      })
-      .catch((error) => {
-        console.error('Error inserting data:', error);
-      });
-  };
-
-  
-  const handleInsertData = async () => {
-    try {
-      const data = { name, age, email, dob };
-      await axios.post('http://10.0.0.14:3000/api/insert', data);
-      Alert.alert('Data inserted successfully');
-      console.log('Data inserted successfully');
-      setName('')
-      setEmail('')
-      setAge('')
-      setDob('')
-    } catch (error) {
-      console.error('Error inserting data:', error);
-    }
-  };
-
-
   return (
-    <View style={{marginTop:80}}>
-      <Button title='Print data' onPress={handlePrintData}/>
-      <View style={{marginTop:40}}>
-        <TextInput placeholder='name' style={styles.input} onChangeText={(text) => setName(text)} value={name}/>
-        <TextInput placeholder='email' style={styles.input} onChangeText={(text) => setEmail(text)} value={email}/>
-        <TextInput placeholder='age' style={styles.input} onChangeText={(text) => setAge(text)} value={age}/>
-        <TextInput placeholder='date of birdth' style={styles.input} onChangeText={(text) => setDob(text)} value={dob}/>
-      <Button title='Add Student' onPress={handleInsertData}/>
+    <View style={{ marginTop: 80 }}>
+      <Button title='Print data' onPress={handlePrintData2} />
+      <View style={{ marginTop: 40 }}>
+        <TextInput
+          placeholder='name'
+          style={styles.input}
+          onChangeText={(text) => setName(text)}
+          value={name}
+        />
+        <TextInput
+          placeholder='email'
+          style={styles.input}
+          onChangeText={(text) => setEmail(text)}
+          value={email}
+        />
+        <TextInput
+          placeholder='age'
+          style={styles.input}
+          onChangeText={(text) => setAge(text)}
+          value={age}
+        />
+        <TextInput
+          placeholder='date of birth'
+          style={styles.input}
+          onChangeText={(text) => setDob(text)}
+          value={dob}
+        />
+        <Button title='Add Student' onPress={handleInsertData} />
       </View>
-      <Modal visible={ModalOpen}  animationType='slide'>
-      <MaterialIcons name='close' size={45} onPress={() => setModalOpen(false)}/>
-    <ScrollView style={styles.scroll}>
-      <View style={styles.container}>
-            <Text style={{left:-80, fontSize: 24, fontWeight:'bold'}}>Data from Database:</Text>
-      {data.map((item, index) => (
-      <View key={index}>
-        <Text style={{fontSize:20, fontWeight:'bold'}}>Student Number {index+1}:</Text>
-        <Text>id: {item.id}</Text>
-        <Text>name: {item.name}</Text>
-        <Text>email: {item.email}</Text>
-        <Text>age: {item.age}</Text>
-        <Text style={{marginBottom:10}}>date of birth: {item.dob}</Text>
-      </View>
-    ))}
-    </View>
-    </ScrollView>
-    </Modal>
+      <Modal visible={ModalOpen} animationType='slide'>
+        <MaterialIcons name='close' size={45} onPress={() => setModalOpen(false)} />
+        <ScrollView style={styles.scroll}>
+          <View style={styles.container}>
+            <Text style={{ left: -80, fontSize: 24, fontWeight: 'bold' }}>
+              Data from Database:
+            </Text>
+            {sqliteData.map((item, index) => (
+              <View key={index}>
+                <Text>ID: {item.id}</Text>
+                <Text>Name: {item.name}</Text>
+                <Text>Age: {item.age}</Text>
+              </View>
+            ))}
+          </View>
+        </ScrollView>
+      </Modal>
     </View>
   );
 }
@@ -108,8 +112,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 20
   },
-  scroll : {
-    height: "100%"
+  scroll: {
+    height: '100%'
   },
   input: {
     paddingVertical: 15,
@@ -120,8 +124,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     width: 250,
     textAlign: 'center',
-    marginHorizontal: '20',
+    marginHorizontal: 20,
     marginLeft: '20%',
     marginBottom: 10
-  },
+  }
 });
