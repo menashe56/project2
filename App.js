@@ -55,7 +55,7 @@ export default function App() {
 
   return (
     <View style={{ marginTop: 80 }}>
-      <Button title='Print data' onPress={handlePrintData2} />
+      <Button title='Print' onPress={handlePrintData2} />
       <View style={{ marginTop: 40 }}>
         <TextInput
           placeholder='name'
