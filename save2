@@ -109,3 +109,8 @@ const styles = StyleSheet.create({
     marginBottom: 10
   },
 });
+
+
+"start": "npm-run-all -p start-expo start-server",
+    "start-expo": "expo start",
+    "start-server": "node server/server.js",

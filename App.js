@@ -42,6 +42,7 @@ export default function App() {
         (error) => console.log('Error:', error)
       );
     });
+    setModalOpen(true)
   };
 
   // Add your handleInsertData function here (to insert data into SQLite)
@@ -81,7 +82,6 @@ export default function App() {
           onChangeText={(text) => setDob(text)}
           value={dob}
         />
-        <Button title='Add Student' onPress={handleInsertData} />
       </View>
       <Modal visible={ModalOpen} animationType='slide'>
         <MaterialIcons name='close' size={45} onPress={() => setModalOpen(false)} />
